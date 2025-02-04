@@ -8,7 +8,6 @@ on:
 
 jobs:
   preview:
-    name: Preview
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -28,9 +27,6 @@ jobs:
         id: changed_packages
         if: github.ref != 'refs/heads/main'
         run: |
-          echo "github.event_name: ${{ github.event_name }}"
-          echo ${{ toJson(github.event) }}
-
           if [ "${{ github.event_name }}" = "pull_request" ]; then
             TURBO_SCM_BASE="${{ github.event.pull_request.base.sha }}"
             TURBO_SCM_HEAD="${{ github.event.pull_request.head.sha }}"
