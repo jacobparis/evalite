@@ -24,6 +24,14 @@ jobs:
           # We can't just filter and let it delegate because it will publish
           # individually for each package, which is explicitly forbidden
           # https://github.com/stackblitz-labs/pkg.pr.new?tab=readme-ov-file#setup
+          if [ "${{ github.event_name }}" = "pull_request" ]; then
+            TURBO_SCM_BASE="${{ github.event.pull_request.base.sha }}"
+            TURBO_SCM_HEAD="${{ github.event.pull_request.head.sha }}"
+          else
+            TURBO_SCM_BASE="${{ github.event.before }}"
+            TURBO_SCM_HEAD="${{ github.sha }}"
+          fi
+
           packages=$(pnpx turbo run build --affected --dry-run \
             | awk '
                 /Global/ { exit }
