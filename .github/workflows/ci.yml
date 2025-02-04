@@ -9,7 +9,6 @@ jobs:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
-          ref: ${{ github.event.pull_request.head.sha }}
 
       - uses: pnpm/action-setup@v4
       - uses: actions/setup-node@v4
@@ -28,7 +27,7 @@ jobs:
           # We can't just filter and let it delegate because it will publish
           # individually for each package, which is explicitly forbidden
           # https://github.com/stackblitz-labs/pkg.pr.new?tab=readme-ov-file#setup
-          packages=$(pnpx turbo run build --affected --dry-run \
+          packages=$(pnpx turbo run build --since ${{ github.event.pull_request.base.sha }} --dry-run \
             | awk '
                 /Global/ { exit }
                 /packages\// {
