@@ -10,9 +10,7 @@ jobs:
         with:
           fetch-depth: 0
           ref: ${{ github.event.pull_request.head.sha }}
-      - name: Echo github obj
-        run: echo ${{ toJson(github.event) }}
-
+          
       - name: Get real merge base
         run: |
           # Set the base reference: if the event is a pull_request, use its base branch; otherwise, default to "main"
