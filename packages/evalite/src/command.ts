@@ -7,10 +7,12 @@ export const createProgram = (commands: {
 }) => {
   const program = new Command();
 
+  
   program
-    .description("Run evals once and exit")
-    .action(() => commands.runOnceAtPath(undefined));
+  .description("Run evals once and exit")
+  .action(() => commands.runOnceAtPath(undefined));
 
+  console.log("Not implemented");
   program
     .command("watch [path]")
     .description("Watch evals for file changes")
