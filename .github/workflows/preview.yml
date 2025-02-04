@@ -32,7 +32,7 @@ jobs:
          packages=$(pnpx turbo ls --affected --output=json \
           | jq -r '.packages.items[].path' \
           | paste -sd ',' - \ # comma separated list, single line
-          | sed 's/^/"/;s/$/"/;s/,/","/g' \ # wrap in double quotes and escape commas
+          | sed 's/^/"/;s/$/"/;s/,/","/g'
         )
 
         if [ -z "$packages" ]; then
