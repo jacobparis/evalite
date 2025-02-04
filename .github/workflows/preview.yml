@@ -28,12 +28,15 @@ jobs:
         id: changed_packages
         if: github.ref != 'refs/heads/main'
         run: |
+          echo "github.event_name: ${{ github.event_name }}"
+          echo ${{ toJson(github.event) }}
+
           if [ "${{ github.event_name }}" = "pull_request" ]; then
             TURBO_SCM_BASE="${{ github.event.pull_request.base.sha }}"
-            TURBO_SCM_BASE="${{ github.event.pull_request.head.sha }}"
+            TURBO_SCM_HEAD="${{ github.event.pull_request.head.sha }}"
           else
             TURBO_SCM_BASE="${{ github.event.before }}"
-            TURBO_SCM_BASE="${{ github.sha }}"
+            TURBO_SCM_HEAD="${{ github.sha }}"
           fi
 
           packages=$(pnpx turbo ls --affected --output=json \
