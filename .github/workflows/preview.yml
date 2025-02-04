@@ -32,7 +32,7 @@ jobs:
           packages=$(pnpx turbo ls --affected --output=json \
             | jq -r '.packages.items[].path' \
             | paste -sd ',' - \
-            | sed 's/^/"/;s/$/"/;s/,/","/g')
+            | sed 's/^/"/;s/$/"/;s/,/" "/g')
 
           if [ -z "$packages" ]; then
             echo "No packages changed"
