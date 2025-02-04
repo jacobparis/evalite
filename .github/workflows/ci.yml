@@ -11,7 +11,7 @@ jobs:
           fetch-depth: 0
           ref: ${{ github.event.pull_request.head.sha }}
       - name: Echo github obj
-        run: echo ${{ toJson(github.event.pull_request) }}
+        run: echo ${{ toJson(github) }}
 
       - name: Get real merge base
         run: |
