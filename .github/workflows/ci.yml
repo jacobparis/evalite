@@ -15,3 +15,26 @@ jobs:
 
       - run: pnpm install --no-frozen-lockfile
       - run: pnpm run ci
+
+      - name: Get affected packages paths
+        id: changed_packages
+        if: github.ref != 'refs/heads/main'
+        run: |
+          # Turbo doesn't seem to have a better way to list affected packages
+          # We can't just filter and let it delegate because it will publish
+          # individually for each package, which is explicitly forbidden
+          # https://github.com/stackblitz-labs/pkg.pr.new?tab=readme-ov-file#setup
+          packages=$(pnpx turbo run build --affected --dry-run \
+            | awk '
+                /Global/ { exit }
+                /packages\// {
+                  if (paths) { paths = paths " ./" $2 }
+                  else       { paths = "./" $2 }
+                }
+                END { print paths }')
+          echo "Detected packages: $packages"
+          echo "packages=$packages" >> $GITHUB_OUTPUT
+
+      - name: Publish preview releases
+        if: github.ref != 'refs/heads/main' && steps.changed_packages.outputs.packages != ''
+        run: pnpx pkg-pr-new publish ${{ steps.changed_packages.outputs.packages }}
