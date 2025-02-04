@@ -102,7 +102,6 @@ export const evalite = <TInput, TExpected = TInput>(
 
         const rootDir = path.join(cwd, FILES_LOCATION);
 
-        console.log('log log log')
         task.meta.evalite = {
           duration: undefined,
           initialResult: {
