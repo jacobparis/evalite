@@ -28,9 +28,6 @@ jobs:
           # Expose these as environment variables for Turborepo
           echo "TURBO_SCM_BASE=$BASE_SHA" >> $GITHUB_ENV
           echo "TURBO_SCM_HEAD=$HEAD_SHA" >> $GITHUB_ENV
-          
-          echo "base: $BASE_SHA"
-          echo "head: $HEAD_SHA"
 
       - uses: pnpm/action-setup@v4
       - uses: actions/setup-node@v4
