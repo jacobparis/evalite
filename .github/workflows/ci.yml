@@ -11,15 +11,6 @@ jobs:
           fetch-depth: 0
           ref: ${{ github.event.pull_request.head.sha }}
 
-      - uses: pnpm/action-setup@v4
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 22.x
-          cache: "pnpm"
-
-      - run: pnpm install --no-frozen-lockfile
-      - run: pnpm run ci
-
       - name: Get real merge base
         run: |
           # Set the base reference: if the event is a pull_request, use its base branch; otherwise, default to "main"
@@ -36,8 +27,18 @@ jobs:
           echo "TURBO_SCM_BASE=$BASE_SHA" >> $GITHUB_ENV
           echo "TURBO_SCM_HEAD=$HEAD_SHA" >> $GITHUB_ENV
           
-          echo "base: $TURBO_SCM_BASE"
-          echo "head: $TURBO_SCM_HEAD"
+          echo "base: $BASE_SHA"
+          echo "head: $HEAD_SHA"
+
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22.x
+          cache: "pnpm"
+
+      - run: pnpm install --no-frozen-lockfile
+      - run: pnpm run ci
+
       - name: Get affected packages paths
         id: changed_packages
         if: github.ref != 'refs/heads/main'
