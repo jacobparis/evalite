@@ -24,21 +24,17 @@ jobs:
         run: |
           # Set the base reference: if the event is a pull_request, use its base branch; otherwise, default to "main"
 
-          if [ -z "${{ github.event.pull_request.base.ref }}" ]; then
-            BASE_REF="${{ github.event.pull_request.base.ref }}"
+          if [ "${{ github.event_name }}" = "pull_request" ]; then
+            BASE_SHA="${{ github.event.pull_request.base.sha }}"
+            HEAD_SHA="${{ github.event.pull_request.head.sha }}"
           else
-            BASE_REF="main"
+            BASE_SHA="${{ github.event.before }}"
+            HEAD_SHA="${{ github.sha }}"
           fi
           
-          # Ensure we have the base branch locally
-          git fetch origin $BASE_REF
-
-          # Compute the common ancestor between HEAD and the base branch
-          MERGE_BASE=$(git merge-base HEAD origin/$BASE_REF)
-
           # Expose these as environment variables for Turborepo
-          echo "TURBO_SCM_BASE=$MERGE_BASE" >> $GITHUB_ENV
-          echo "TURBO_SCM_HEAD=$(git rev-parse HEAD)" >> $GITHUB_ENV
+          echo "TURBO_SCM_BASE=$BASE_SHA" >> $GITHUB_ENV
+          echo "TURBO_SCM_HEAD=$HEAD_SHA" >> $GITHUB_ENV
           
           echo "base: $TURBO_SCM_BASE"
           echo "head: $TURBO_SCM_HEAD"
