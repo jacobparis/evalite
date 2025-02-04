@@ -23,7 +23,12 @@ jobs:
       - name: Get real merge base
         run: |
           # Set the base reference: if the event is a pull_request, use its base branch; otherwise, default to "main"
-          BASE_REF="${{ github.event_name == 'pull_request' ? github.event.pull_request.base.ref : 'main' }}"
+
+          if [ -z "${{ github.event.pull_request.base.ref }}" ]; then
+            BASE_REF="${{ github.event.pull_request.base.ref }}"
+          else
+            BASE_REF="main"
+          fi
           
           # Ensure we have the base branch locally
           git fetch origin $BASE_REF
