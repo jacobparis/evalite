@@ -20,22 +20,24 @@ jobs:
       - run: pnpm install --no-frozen-lockfile
       - run: pnpm run ci
 
+      - name: Get real merge base
+        run: |
+          # Ensure we have base branch locally
+          git fetch origin ${{ github.event.pull_request.base.ref }}
+
+          # Compute the common ancestor between HEAD and base
+          MERGE_BASE=$(git merge-base HEAD origin/${{ github.event.pull_request.base.ref }})
+
+          # Expose these as environment variables for Turborepo
+          echo "TURBO_SCM_BASE=$MERGE_BASE" >> $GITHUB_ENV
+          echo "TURBO_SCM_HEAD=$(git rev-parse HEAD)" >> $GITHUB_ENV
+          
+          echo "base: $TURBO_SCM_BASE"
+          echo "head: $TURBO_SCM_HEAD"
       - name: Get affected packages paths
         id: changed_packages
         if: github.ref != 'refs/heads/main'
         run: |
-          # Turbo doesn't seem to have a better way to list affected packages
-          # We can't just filter and let it delegate because it will publish
-          # individually for each package, which is explicitly forbidden
-          # https://github.com/stackblitz-labs/pkg.pr.new?tab=readme-ov-file#setup
-          if [ "${{ github.event_name }}" = "pull_request" ]; then
-            TURBO_SCM_BASE="${{ github.event.pull_request.base.sha }}"
-            TURBO_SCM_HEAD="${{ github.event.pull_request.head.sha }}"
-          else
-            TURBO_SCM_BASE="${{ github.event.before }}"
-            TURBO_SCM_HEAD="${{ github.sha }}"
-          fi
-
           echo "base: $TURBO_SCM_BASE"
           echo "head: $TURBO_SCM_HEAD"
 
