@@ -7,6 +7,8 @@ export const createProgram = (commands: {
 }) => {
   const program = new Command();
 
+  throw new Error("Not implemented");
+  
   program
     .description("Run evals once and exit")
     .action(() => commands.runOnceAtPath(undefined));
