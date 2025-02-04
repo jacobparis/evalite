@@ -29,10 +29,10 @@ jobs:
         env:
           TURBO_SCM_BASE: ${{ github.event_name == 'pull_request' && github.event.pull_request.base.sha || github.event.before }}
         run: |
-        
           packages=$(pnpx turbo ls --affected --output=json \
-            | jq -r '.packages.items[].path' \
-            | paste -sd ", " -
+            | jq -r '.packages.items[].path' \ 
+            | paste -sd ',' - \ # comma separated list, single line
+            | sed 's/^/"/;s/$/"/;s/,/", "/g' \ # wrap in double quotes and escape commas
           )
 
           if [ -z "$packages" ]; then
