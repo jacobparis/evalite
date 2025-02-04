@@ -35,11 +35,14 @@ jobs:
             TURBO_SCM_HEAD="${{ github.sha }}"
           fi
 
+          echo "base: $TURBO_SCM_BASE"
+          echo "head: $TURBO_SCM_HEAD"
+
           packages=$(pnpx turbo ls --affected --output=json \
             | jq -r '.packages.items[].path' \
             | paste -sd ", " -
           )
-          
+
           if [ -z "$packages" ]; then
             echo "No packages changed"
             echo "packages=" >> $GITHUB_OUTPUT
