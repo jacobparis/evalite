@@ -27,15 +27,10 @@ jobs:
           # We can't just filter and let it delegate because it will publish
           # individually for each package, which is explicitly forbidden
           # https://github.com/stackblitz-labs/pkg.pr.new?tab=readme-ov-file#setup
-          packages=$(pnpx turbo run build --since ${{ github.event.pull_request.base.sha }} --dry-run \
-            | awk '
-                /Global/ { exit }
-                /packages\// {
-                  if (paths) { paths = paths " ./" $2 }
-                  else       { paths = "./" $2 }
-                }
-                END { print paths }')
-
+          packages=$(pnpx turbo ls --affected --output=json \
+            | jq -r '.packages.items[].path' \
+            | paste -sd ", " -
+          )
           if [ -z "$packages" ]; then
             echo "No packages changed"
             echo "packages=" >> $GITHUB_OUTPUT
