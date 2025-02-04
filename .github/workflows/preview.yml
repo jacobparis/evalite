@@ -1,0 +1,54 @@
+name: Preview
+
+on:
+  pull_request:
+    branches: ["main"]
+    paths:
+      - "packages/**"
+
+jobs:
+  preview:
+    name: Preview
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22.x
+          cache: "pnpm"
+
+      - name: Get affected packages paths
+        id: changed_packages
+        if: github.ref != 'refs/heads/main'
+        run: |
+          if [ "${{ github.event_name }}" = "pull_request" ]; then
+            TURBO_SCM_BASE="${{ github.event.pull_request.base.sha }}"
+            TURBO_SCM_BASE="${{ github.event.pull_request.head.sha }}"
+          else
+            TURBO_SCM_BASE="${{ github.event.before }}"
+            TURBO_SCM_BASE="${{ github.sha }}"
+          fi
+
+          packages=$(pnpx turbo ls --affected --output=json \
+            | jq -r '.packages.items[].path' \
+            | paste -sd ", " -
+          )
+
+          if [ -z "$packages" ]; then
+            echo "No packages changed"
+            echo "packages=" >> $GITHUB_OUTPUT
+          else
+            echo "Detected packages: $packages"
+            echo "packages=$packages" >> $GITHUB_OUTPUT
+          fi
+
+      - run: pnpm install --no-frozen-lockfile
+      - run: pnpm build
+
+      - name: Publish preview releases
+        if: github.ref != 'refs/heads/main' && steps.changed_packages.outputs.packages != ''
+        run: pnpx pkg-pr-new publish ${{ steps.changed_packages.outputs.packages }}
