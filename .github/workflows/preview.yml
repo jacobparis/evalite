@@ -20,6 +20,9 @@ jobs:
         with:
           node-version: 22.x
           cache: "pnpm"
+      
+      - run: pnpm install --no-frozen-lockfile
+      - run: pnpm build
 
       - name: Get affected packages paths
         id: changed_packages
@@ -45,9 +48,6 @@ jobs:
             echo "Detected packages: $packages"
             echo "packages=$packages" >> $GITHUB_OUTPUT
           fi
-
-      - run: pnpm install --no-frozen-lockfile
-      - run: pnpm build
 
       - name: Publish preview releases
         if: github.ref != 'refs/heads/main' && steps.changed_packages.outputs.packages != ''
