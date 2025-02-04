@@ -11,8 +11,8 @@ export const createProgram = (commands: {
   program
   .description("Run evals once and exit")
   .action(() => commands.runOnceAtPath(undefined));
-  
-  throw new Error("Not implemented");
+
+  console.log("Not implemented");
   program
     .command("watch [path]")
     .description("Watch evals for file changes")
